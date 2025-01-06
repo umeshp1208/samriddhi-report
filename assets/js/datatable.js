@@ -14,6 +14,7 @@ $(document).ready(function () {
         d.f_date = $('#date').val()
         d.f_base_date = $('#base_date').val()
         d.growth = $('#growth').val();
+        d.channel = $('#channel').val();
         return d;
       }
     },
