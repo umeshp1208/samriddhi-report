@@ -121,9 +121,9 @@ $selectedDate = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
             <div class="card shadow-lg p-0 border-0">
                 <div class="card-body">
                     <div class="row mb-3">
-                        <div class="col-sm-12 col-md-4">
+                        <div class="col-sm-12 col-md-3 mb-3">
                             <div class="form-group">
-                                <label for="state">State</label>
+                                <label class="form-label fw-bold" for="state">State</label>
                                 <select id="state" name="state[]" class="form-select">
                                     <?php
                                     foreach ($stateData as $stateId => $stateName) {
@@ -135,14 +135,14 @@ $selectedDate = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
                             </div>
                         </div>
 
-                        <div class="col-sm-12 col-md-4">
+                        <div class="col-sm-12 col-md-3 mb-3">
                             <div class="form-group">
-                                <label for="unit">Unit</label>
+                                <label class="form-label fw-bold" for="unit">Unit</label>
                                 <select id="unit" name="unit" class="form-select">
                                     <option value="">Select Unit</option>
                                     <?php
                                     foreach ($unitData as $unitCode => $unitName) {
-                                        echo '<option value="' . $unitCode .'" ' . ($selectedUnit == $unitCode ? 'selected' : '') . '>' . $unitName . '</option>';
+                                        echo '<option value="' . $unitCode . '" ' . ($selectedUnit == $unitCode ? 'selected' : '') . '>' . $unitName . '</option>';
                                     }
                                     ?>
                                     <option value="all">All</option>
@@ -150,30 +150,52 @@ $selectedDate = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
                             </div>
                         </div>
 
-                        <div class="col-sm-12 col-md-4">
+                        <div class="col-sm-12 col-md-3 mb-3">
                             <div class="form-group">
-                                <label for="date">Base Date</label>
+                                <label class="form-label fw-bold" for="date">Base Date</label>
                                 <input type="text" class="form-control" id="base_date" name="base_date" readonly
                                     value="2024-12-10" placeholder="Select Date">
                             </div>
                         </div>
 
-                        <div class="col-sm-12 col-md-4">
+                        <div class="col-sm-12 col-md-3 mb-3">
                             <div class="form-group">
-                                <label for="date">Date</label>
+                                <label class="form-label fw-bold" for="date">Date</label>
                                 <input type="text" class="form-control" id="date" name="date" readonly
-                                    value="2024-12-31" placeholder="Select Date">
+                                    value="<?php echo $selectedDate; ?>" placeholder="Select Date">
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 col-md-3 mb-3">
+                            <div class="form-group">
+                                <label class="form-label fw-bold" for="growth">Growth</label>
+                                <select id="growth" name="growth" class="form-select">
+                                    <option value="all">All</option>
+                                    <option value="zero">Zero(0)</option>
+                                    <option value="positive" selected>Positive(+)</option>
+                                    <option value="negative">Negative(-)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 col-md-3 mb-3">
+                            <div class="form-group">
+                                <label class="form-label fw-bold" for="channel">Channel</label>
+                                <select id="channel" name="channel" class="form-select">
+                                    <option value="DA" selected>DA</option>
+                                    <option value="CA">CA</option>
+                                    <option value="IH">IH</option>
+                                    <option value="IN">IN</option>
+                                </select>
                             </div>
                         </div>
                     </div>
 
                     <div class="row">
-                        <div class="col-sm-12">
-                            <div class="form-group">
-                                <button type="submit" class="btn btn-info btn-sm" id="applyFilter">
-                                    Apply Filter(s)
-                                </button>
-                            </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-info btn-md" id="applyFilter">
+                                Apply Filter(s)
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -225,18 +247,21 @@ $selectedDate = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
 
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.3.1/js/dataTables.buttons.min.js"></script> 
+    <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.3.1/js/dataTables.buttons.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/buttons/1.3.1/js/buttons.html5.min.js"></script>
     <script>
         $(function() {
             $("#date").datepicker({
                 dateFormat: "yy-mm-dd",
+                defaultDate: new Date(),
+                minDate: '-3M',
+                maxDate: '+2D'
             });
 
             $("#base_date").datepicker({
                 dateFormat: "yy-mm-dd",
-                defaultDate: '2024-12-10'
+                defaultDate: '2024-12-10',
             });
 
             $('#state').select2({
@@ -247,6 +272,18 @@ $selectedDate = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
 
             $('#unit').select2({
                 placeholder: 'Select Unit',
+                width: '100%',
+                multiple: false,
+            });
+
+            $('#growth').select2({
+                placeholder: 'Select Growth',
+                width: '100%',
+                multiple: false,
+            });
+
+            $('#channel').select2({
+                placeholder: 'Select Channel',
                 width: '100%',
                 multiple: false,
             });
@@ -287,8 +324,10 @@ $selectedDate = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
                 var state = $('#state').val();
                 var unit = $('#unit').val();
                 var baseDate = $('#base_date').val();
+                var growth = $('#growth').val();
+                var channel = $('#channel').val();
 
-                $('#reportTable').DataTable().ajax.url('ajax.php?f_date=' + date + '&f_state=' + state + '&f_unit=' + unit + '&f_base_date=' + baseDate).load();
+                $('#reportTable').DataTable().ajax.url('ajax.php?f_date=' + date + '&f_state=' + state + '&f_unit=' + unit + '&f_base_date=' + baseDate + '&f_growth=' + growth + '&f_channel=' + channel).load();
             });
         });
     </script>

@@ -20,6 +20,8 @@ $filterState = isset($_GET['f_state']) ? $_GET['f_state'] : 'all';
 $filterUnit = isset($_GET['f_unit']) ? $_GET['f_unit'] : 'BHOP';
 $currentDate = isset($_GET['f_date']) ? $_GET['f_date'] : date('Y-m-d');
 $baseCopyDate = isset($_GET['f_base_date']) ? $_GET['f_base_date'] : date('Y-m-d');
+$growth = isset($_GET['f_growth']) ? $_GET['f_growth'] : 'positive';
+$channel = isset($_GET['f_channel']) ? $_GET['f_channel'] : 'DA';
 
 if (is_array($filterState)) {
     if (in_array('all', $filterState)) {
@@ -37,7 +39,7 @@ SELECT
     base.sold_to_party AS sap_code,
     MAX(base.agency_name) AS agency_name,
     MAX(zvt_p_cir.vkorg) AS unit_code,
-    MAX(zvt_p_cir.city_name) AS place,
+    MAX(zvt_p_reg.city1) AS place,
     MAX(agencystate.state_name) AS state,
     MAX(base.total_base_copy) AS total_base_nps
 FROM (
@@ -55,7 +57,9 @@ LEFT JOIN unitmaster AS unit
     ON zvt_p_cir.vkorg = unit.unit_code
 LEFT JOIN agencystatemaster AS agencystate
     ON unit.state_id_id = agencystate.state_id
-WHERE 1 = 1";
+LEFT JOIN zvt_portal_reg AS zvt_p_reg
+    ON zvt_p_cir.sold_to_party = zvt_p_reg.partner
+WHERE 1 = 1 AND zvt_p_cir.vtweg = '$channel'";
 
 // Adding filters dynamically
 if ($filterState !== 'all') {
@@ -128,6 +132,36 @@ foreach ($records as $record) {
     $growthPercentage = ($record['total_base_nps'] == 0) ? 0 : ($growthDelta / $record['total_base_nps']) * 100;
     $excessFirstBarrier = number_format($growthPercentage - $firstBarrierPercent, 2);
     $excessSecondBarrier = number_format($growthPercentage - $secondBarrierPercent, 2);
+
+    // Check if the record needs to be added
+    $needToAdd = false;
+    switch ($growth) {
+        case 'positive':
+            if ($growthDelta > 0) {
+                $needToAdd = true;
+            }
+            break;
+        case 'negative':
+            if ($growthDelta < 0) {
+                $needToAdd = true;
+            }
+            break;
+        case 'zero':
+            if ($growthDelta == 0) {
+                $needToAdd = true;
+            }
+            break;
+        case 'all':
+            $needToAdd = true;
+            break;
+        default:
+            $needToAdd = false;
+            break;
+    }
+
+    if (!$needToAdd) {
+        continue;
+    }
 
     $recordsData[] = [
         'state' => $record['state'],

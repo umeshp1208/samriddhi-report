@@ -13,25 +13,26 @@ $(document).ready(function () {
         d.f_unit = $('#unit').val()
         d.f_date = $('#date').val()
         d.f_base_date = $('#base_date').val()
-        return d
+        d.growth = $('#growth').val();
+        return d;
       }
     },
     columns: [
-      { data: 'state', orderable: false },
-      { data: 'unit', orderable: false },
-      { data: 'sap_code', orderable: false },
-      { data: 'agency_name', orderable: false },
-      { data: 'place', orderable: false },
-      { data: 'base_nps', orderable: false },
-      { data: 'today_nps', orderable: false },
-      { data: 'growth_plus_minus', orderable: false },
-      { data: 'growth_percentage', orderable: false },
-      { data: 'first_barrier_percent', orderable: false },
-      { data: 'excess_by_first_barrier', orderable: false },
-      { data: 'second_barrier_percent', orderable: false },
-      { data: 'excess_by_second_barrier', orderable: false }
+      { data: 'state', orderable: true },
+      { data: 'unit', orderable: true },
+      { data: 'sap_code', orderable: true },
+      { data: 'agency_name', orderable: true },
+      { data: 'place', orderable: true },
+      { data: 'base_nps', orderable: true },
+      { data: 'today_nps', orderable: true },
+      { data: 'growth_plus_minus', orderable: true },
+      { data: 'growth_percentage', orderable: true },
+      { data: 'first_barrier_percent', orderable: true },
+      { data: 'excess_by_first_barrier', orderable: true },
+      { data: 'second_barrier_percent', orderable: true },
+      { data: 'excess_by_second_barrier', orderable: true }
     ],
-    dom: '<"row"<"col-12"B>><"row"<"col-md-6"l><"col-md-6">>r<"col-12 mt-3 table-responsive"t><"row mt-3"<"col-md-6"i><"col-md-6"p>>',
+    dom: '<"row"<"col-12"B>><"row"<"col-md-6"l><"col-md-6"f>>r<"col-12 mt-3 table-responsive"t><"row mt-3"<"col-md-6"i><"col-md-6"p>>',
     buttons: [
       {
         extend: 'excel',
