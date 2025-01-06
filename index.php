@@ -190,15 +190,17 @@ $baseCopyDate = isset($_POST['base_date']) ? $_POST['base_date'] : '2024-12-10';
                                 </select>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="row">
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-info btn-md" id="applyFilter">
-                                Apply Filter(s)
-                            </button>
+                        <div class="col-sm-12 col-md-3 mb-3">
+                            <div class="form-group mt-2">
+                                <br>
+                                <button type="submit" class="btn btn-info btn-md" id="applyFilter">
+                                    Apply Filter(s)
+                                </button>
+                            </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
