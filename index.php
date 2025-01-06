@@ -36,6 +36,7 @@ if ($unitResult = $conn->query($unitQuery)) {
 $selectedState = isset($_POST['state']) ? $_POST['state'] : $defaultStateId;
 $selectedUnit = isset($_POST['unit']) ? $_POST['unit'] : 'BHOP';
 $selectedDate = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
+$baseCopyDate = isset($_POST['base_date']) ? $_POST['base_date'] : '2024-12-10';
 ?>
 
 <!DOCTYPE html>
@@ -205,12 +206,12 @@ $selectedDate = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
         <div class="row justify-content-center">
             <div class="card shadow-lg p-0 border-0">
                 <div class="card-header bg-warning text-center">
-                    <h3 class="mb-0 font-weight-bold">Agent's Slab Barriers Report</h3>
+                    <h3 class="card-title">Agent's Slab Barriers Report</h3>
                 </div>
 
                 <div class="card-body p-3">
-                    <table class="table table-striped table-bordered nowrap" cellspacing="0" width="100%"
-                        id="reportTable">
+                    <table class="table table-striped table-bordered nowrap dt-responsive display" cellspacing="0" width="100%"
+                        id="reportTable" title="Agent's Slab Barriers Report">
                         <thead class="bg-secondary text-white">
                             <tr>
                                 <th>State</th>
@@ -218,8 +219,8 @@ $selectedDate = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
                                 <th>Sap Code</th>
                                 <th>Name of Agency</th>
                                 <th>Place</th>
-                                <th>Base NPS</th>
-                                <th>Today NPS</th>
+                                <th>Base NPS (<span id="l_base_date"><?php echo $baseCopyDate; ?></span>)</th>
+                                <th>Today NPS (<span id="l_date"><?php echo $selectedDate; ?></span>)</th>
                                 <th>Growth (+/-)</th>
                                 <th>Growth %</th>
                                 <th>1st Barrier %</th>
@@ -328,6 +329,8 @@ $selectedDate = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
                 var channel = $('#channel').val();
 
                 $('#reportTable').DataTable().ajax.url('ajax.php?f_date=' + date + '&f_state=' + state + '&f_unit=' + unit + '&f_base_date=' + baseDate + '&f_growth=' + growth + '&f_channel=' + channel).load();
+                $('#l_date').text(date);
+                $('#l_base_date').text(baseDate);
             });
         });
     </script>
