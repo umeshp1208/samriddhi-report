@@ -23,7 +23,7 @@ if ($f_state == 'all') {
         um.unit_full_name
     FROM
         depot_master dm
-        LEFT JOIN unit_master um ON dm.unit_id = um.unit_id;
+        LEFT JOIN unit_master um ON dm.unit_id = um.unit_id
     ";
 } else {
     $f_state = implode(',', $f_state);
@@ -34,7 +34,7 @@ if ($f_state == 'all') {
     FROM
         depot_master dm
         LEFT JOIN state_master sm ON dm.state_id = sm.state_id
-        LEFT JOIN unit_master um ON dm.unit_id = um.unit_id;
+        LEFT JOIN unit_master um ON dm.unit_id = um.unit_id
     WHERE
         dm.state_id IN ($f_state);
     ";

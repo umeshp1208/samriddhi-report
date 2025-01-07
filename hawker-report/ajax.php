@@ -122,8 +122,6 @@ $queryBaseData .= " GROUP BY
   ds.`edtn_code`;
 ";
 
-logMessage($queryBaseData);
-
 // Prepare the statement
 $stmtBaseData = $conn->prepare($queryBaseData);
 if ($stmtBaseData === false) {
@@ -146,6 +144,7 @@ foreach ($records as $record) {
     $firstBarrierPercent = $record['barrier1'] ?? 0;
     $secondBarrierPercent = $record['barrier2'] ?? 0;
 
+    $record['today_copy'] = $record['today_copy'] ?? 0;
     $growthDelta = $record['today_copy'] - $record['seven_day_avg'];
     $growthDelta = $growthDelta ?? 0;
     $growthDelta = $growthDelta ? number_format($growthDelta, 2) : 0;
@@ -177,6 +176,9 @@ foreach ($records as $record) {
                 $needToAdd = true;
             }
             break;
+        case 'all':
+            $needToAdd = true;
+            break;
         default:
             $needToAdd = false;
             break;
@@ -192,8 +194,8 @@ foreach ($records as $record) {
         'sap_code' => $record['hawker_code'] ?? '',
         'vendor_name' => $record['hawker_name'] ?? '',
         'depot_name' => $record['depot_name'] ?? '',
-        'base_nps' => $record['seven_day_avg'] ?? '',
-        'today_nps' => $record['today_copy'] ?? '',
+        'base_nps' => $record['seven_day_avg'] ?? 0,
+        'today_nps' => $record['today_copy'] ?? 0,
         'growth_plus_minus' => $growthDelta,
         'growth_percentage' => $growthPercentage,
         'first_barrier_percent' => $firstBarrierPercent,
