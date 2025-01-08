@@ -18,9 +18,10 @@ $(document).ready(function () {
     columns: [
       { data: 'state', orderable: true },
       { data: 'unit', orderable: true },
+      { data: 'depot_name', orderable: true },
       { data: 'sap_code', orderable: true },
       { data: 'vendor_name', orderable: true },
-      { data: 'depot_name', orderable: true },
+      { data: 'edtn_code', orderable: true },
       { data: 'base_nps', orderable: true },
       { data: 'today_nps', orderable: true },
       { data: 'growth_plus_minus', orderable: true },
@@ -40,6 +41,9 @@ $(document).ready(function () {
     ],
     columnDefs: [
       { targets: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], className: 'text-center' }
-    ]
+    ],
+    drawCallback: function () {
+      $('#loader').hide();
+    }
   })
 })

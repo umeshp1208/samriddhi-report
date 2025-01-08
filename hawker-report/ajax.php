@@ -20,6 +20,7 @@ $filterState = isset($_GET['f_state']) && !empty($_GET['f_state']) ? $_GET['f_st
 $filterUnit = isset($_GET['f_unit']) ? $_GET['f_unit'] : 'all';
 $currentDate = isset($_GET['f_date']) ? $_GET['f_date'] : date('Y-m-d');
 $growth = isset($_GET['f_growth']) ? $_GET['f_growth'] : 'positive';
+$publication = isset($_GET['f_publication']) ? $_GET['f_publication'] : 'all';
 
 if (is_array($filterState)) {
     if (in_array('all', $filterState)) {
@@ -42,11 +43,12 @@ $conn->query($setMode);
 $queryBaseData = "
 SELECT
   state.`state_name`,
-  unit.`unit_name`,
+  unit.`unit_full_name`,
   depot.`depot_name`,
   ds.`hawker_code`,
   ds.`edtn_code`,
   hm.`hawker_name`,
+  `publ_code`,
   ROUND(AVG(ds.`supl_copies`), 0) AS `seven_day_avg`,
   (
     SELECT
@@ -90,6 +92,7 @@ FROM
       `unit_id`,
       `depot_id`,
       `hawker_id`,
+      `publ_code`,
       SUM(`supl_copies`) AS `supl_copies`
     FROM
       `circulation`.`datewisesupply`
@@ -114,6 +117,10 @@ if ($filterState !== 'all') {
 
 if ($filterUnit !== 'all') {
     $queryBaseData .= " AND unit.unit_id = $filterUnit";
+}
+
+if ($publication !== 'all') {
+    $queryBaseData .= " AND ds.`publ_code` = '$publication'";
 }
 
 // Finalizing the query
@@ -190,18 +197,19 @@ foreach ($records as $record) {
 
     $recordsData[] = [
         'state' => $record['state_name'] ?? '',
-        'unit' => $record['unit_name'] ?? '',
+        'unit' => $record['unit_full_name'] ?? '',
         'sap_code' => $record['hawker_code'] ?? '',
         'vendor_name' => $record['hawker_name'] ?? '',
+        'edtn_code' => $record['edtn_code'] ?? '',
         'depot_name' => $record['depot_name'] ?? '',
         'base_nps' => $record['seven_day_avg'] ?? 0,
         'today_nps' => $record['today_copy'] ?? 0,
         'growth_plus_minus' => $growthDelta,
-        'growth_percentage' => $growthPercentage,
-        'first_barrier_percent' => $firstBarrierPercent,
-        'excess_by_first_barrier' => $excessFirstBarrier,
-        'second_barrier_percent' => $secondBarrierPercent,
-        'excess_by_second_barrier' => $excessSecondBarrier,
+        'growth_percentage' => $growthPercentage.'%',
+        'first_barrier_percent' => $firstBarrierPercent.'%',
+        'excess_by_first_barrier' => $excessFirstBarrier.'%',
+        'second_barrier_percent' => $secondBarrierPercent.'%',
+        'excess_by_second_barrier' => $excessSecondBarrier.'%',
     ];
 }
 

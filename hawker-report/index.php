@@ -37,6 +37,19 @@ if ($stateAndUnitResult->num_rows > 0) {
 $defaultStateId = array_search($defaultStateName, $stateData);
 $defaultUnitId = array_search($defaultUnitName, $unitData);
 
+$publQuery = "
+SELECT * FROM `circulation`.`publ_master`;
+";
+
+$publResult = $conn->query($publQuery);
+
+$publicationData = [];
+if ($publResult->num_rows > 0) {
+    while ($row = $publResult->fetch_assoc()) {
+        $publicationData[$row['publ_code']] = $row['publ_name'];
+    }
+}
+
 $selectedState = isset($_POST['state']) ? $_POST['state'] : $defaultStateId;
 $selectedUnit = isset($_POST['unit']) ? $_POST['unit'] : $defaultUnitId;
 $selectedDate = isset($_POST['date']) ? $_POST['date'] : date('Y-m-d');
@@ -91,10 +104,35 @@ $baseDate = '2024-12-04 TO 2024-12-10';
             height: 38px;
             border: 1px solid #dee2e6;
         }
+
+        /* Loader */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+
+        .loader i {
+            font-size: 24px;
+            color: #fff;
+        }
     </style>
 </head>
 
 <body class="bg-light mt-5">
+
+    <!-- Loader -->
+    <div class="loader" id="loader">
+        <i class="fas fa-spinner fa-spin"></i>
+    </div>
+
     <div class="container">
         <div class="row mb-3">
             <div class="card shadow-lg p-0 border-0">
@@ -150,6 +188,20 @@ $baseDate = '2024-12-04 TO 2024-12-10';
 
                         <div class="col-sm-12 col-md-3 mb-3">
                             <div class="form-group">
+                                <label class="form-label fw-bold" for="publication">Publication</label>
+                                <select id="publication" name="publication" class="form-select">
+                                    <option value="all">All</option>
+                                    <?php
+                                    foreach ($publicationData as $publicationId => $publicationName) {
+                                        echo '<option value="' . $publicationId . '" ' . ($selectedPublication == $publicationId ? 'selected' : '') . '>' . $publicationName . '</option>';
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 col-md-3 mb-3">
+                            <div class="form-group">
                                 <br>
                                 <button type="submit" class="btn btn-info btn-md" id="applyFilter">
                                     Apply Filter(s)
@@ -175,9 +227,10 @@ $baseDate = '2024-12-04 TO 2024-12-10';
                             <tr>
                                 <th>State</th>
                                 <th>Unit</th>
-                                <th>Sap Code</th>
-                                <th>Name of Agent</th>
                                 <th>Depot Name</th>
+                                <th>Hawker Code</th>
+                                <th>Name of Hawker</th>
+                                <th>Edition Code</th>
                                 <th>Base NPS (<span id="s_date"><?php echo $baseDate; ?></span>)</th>
                                 <th>Today NPS (<span id="l_date"><?php echo $selectedDate; ?></span>)</th>
                                 <th>Growth (+/-)</th>
@@ -275,12 +328,15 @@ $baseDate = '2024-12-04 TO 2024-12-10';
             });
 
             $('#applyFilter').on('click', function() {
+                $('#loader').show();
+
                 var date = $('#date').val();
                 var state = $('#state').val();
                 var unit = $('#unit').val();
                 var growth = $('#growth').val();
+                var publication = $('#publication').val();
 
-                $('#reportTable').DataTable().ajax.url('ajax.php?f_date=' + date + '&f_state=' + state + '&f_unit=' + unit + '&f_growth=' + growth).load();
+                $('#reportTable').DataTable().ajax.url('ajax.php?f_date=' + date + '&f_state=' + state + '&f_unit=' + unit + '&f_growth=' + growth + '&f_publication=' + publication).load();
                 $('#l_date').text(date);
             });
         });
